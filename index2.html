@@ -1,0 +1,144 @@
+<html>
+  <head>
+    <title>Fact-ory</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <style>
+        .feedbackContainer {
+              height: 100;
+              width: 200;
+        }
+
+        .buttonContainer{
+            padding-top: 33px;
+            transition: display 1s;
+        }
+    </style>
+  </head>
+
+  <body bgcolor=white>
+    <div class='container'>
+      <div style="width: 100%; text-align: center; margin-bottom: 20px;">
+        <h1>Fact-ory</h1>
+        <button type="button" class="btn btn-primary" onclick='analyze();'>Analyze</button><br/>
+      </div>
+
+      <textarea style='height: 300px; transition: background-color 0.5s linear' placeholder="Enter Article Body" id='inputText' class="form-control" rows="5" id="comment"></textarea>
+
+      <div id='responseContainer' style='visibility : hidden; opacity: 0; transition: visibility 0s, opacity 0.5s linear; text-align: center;' >
+        <div>Detected as: <div style='font-weight: bold' id='serverResponse'></div></div>
+      
+
+        <div style="width: 100%; margin-bottom: 20px; padding-top: 20%;">
+          <div id='feedbackContainer' style='transition: visibility 0s, opacity 0.5s linear;'>
+            <p>Was this analysis accurate?</p>
+            <div>
+              <div id='buttonContainer' style='padding-left: 5%;'>
+                <table style="width:300px; margin: 0px auto;">
+                  <tr>
+                    <th></th>
+                    <th>1</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                    <th>5</th>
+                  </tr>
+                    <tr>
+                      <td></td>
+                      <td><input type="checkbox" value="" label='1'></td>
+                      <td><input type="checkbox" value="" label='1'></td>
+                      <td><input type="checkbox" value="" label='1'></td>
+                      <td><input type="checkbox" value="" label='1'></td>
+                      <td><input type="checkbox" value="" label='1'></td>
+                    </tr>
+                  </table>
+              </div>
+                <button style='margin-top: 30px;' onclick='clickYes();' type="button" class="btn btn-success">
+                Submit</button>                
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Button trigger modal -->
+    <div style='visibility : hidden;'>
+      <button  id='buttonToPress' type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+        Launch demo modal
+      </button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content" style='text-align: center;'>
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalTitle"></h5>
+          </div>
+          <div id='modalBody' class="modal-body">
+            
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    function analyze(){
+      var text = document.getElementById("inputText").value;
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+          if (this.status == 200) {
+             var response = xhttp.responseText;
+             console.log('response: ' , response);
+             document.getElementById("serverResponse").innerHTML = response;
+
+            if (response === 'opinion'){
+                document.getElementById("serverResponse").style.color = 'red';
+                document.getElementById("inputText").style.backgroundColor = 'rgb(252, 209, 204)';
+            } else {
+                document.getElementById("serverResponse").style.color = 'green';
+                document.getElementById("inputText").style.backgroundColor = 'rgb(223, 252, 204)';
+            }
+
+             document.getElementById("responseContainer").style.opacity = 1;
+             document.getElementById("responseContainer").style.visibility = "visible";
+             document.getElementById("feedbackContainer").style.opacity = 1;
+              document.getElementById("feedbackContainer").style.visibility = "visible";
+
+             //highlight or display results here
+          } else {
+            // console.log('there was an error with this request: ' + this.status);
+          }
+      };
+      xhttp.open("POST", "http://localhost:8000/analyze?text=" + text, true);
+      xhttp.send();
+    }
+
+    function clickYes(){
+      document.getElementById('modalTitle').innerHTML = 'Thank you!';
+      document.getElementById('modalBody').innerHTML = 'We will be using your feedback to further tweak our algorithm';
+      document.getElementById("buttonToPress").click();
+      hideButtons()
+    }
+
+    function hideButtons(){
+      document.getElementById("feedbackContainer").style.opacity = 0;
+      document.getElementById("feedbackContainer").style.visibility = "hidden";
+    }
+
+  </script>
+</html>
